@@ -23,7 +23,7 @@ func getConfig() Config {
 	defer func() {
 		err := file.Close()
 		if err != nil {
-			log.Printf("Error closing config file: %s", err)
+			log.Println("Error closing config file: ", err)
 		}
 	}()
 
@@ -32,7 +32,7 @@ func getConfig() Config {
 
 	err := decoder.Decode(&config)
 	if err != nil {
-		log.Fatal("Error decoding config file: ", err)
+		log.Fatalln("Error decoding config file: ", err)
 	}
 
 	return config
@@ -49,13 +49,13 @@ func handleFileOpenErr(err error) {
 
 	if err != nil {
 		if os.IsNotExist(err) {
-			log.Fatal("Config file does not exist")
+			log.Fatalln("Config file does not exist")
 		} else if os.IsPermission(err) {
-			log.Fatal("No permission to read config file")
+			log.Fatalln("No permission to read config file")
 		} else if err.(*os.PathError).Err == syscall.EISDIR {
-			log.Fatal("Config file is a directory")
+			log.Fatalln("Config file is a directory")
 		} else {
-			log.Fatal("Error opening config file: ", err)
+			log.Fatalln("Error opening config file: ", err)
 		}
 	}
 }

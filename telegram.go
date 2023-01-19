@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	// Use config.yml to store the bot token and server URL
+
 	config := getConfig()
 	botToken := config.Telegram.BotToken
 	serverUrl := config.Telegram.ServerUrl
@@ -15,29 +15,24 @@ func main() {
 
 	bot, err := tgbot.NewBotAPI(botToken)
 	if err != nil {
-		log.Println("Error creating Telegram bot:", err)
+		log.Println("Error creating Telegram bot: ", err)
 		return
 	}
 
 	bot.Debug = true
-	log.Printf("Authorized on account %s", bot.Self.UserName)
+	log.Println("Authorized on account: ", bot.Self.UserName)
 
 	_, err = bot.SetWebhook(tgbot.NewWebhook(serverUrl + webhookPath))
 	if err != nil {
-		log.Println("Error setting webhook:", err)
-		return
+		log.Fatalln("Error setting webhook: ", err)
 	}
 
 	updates := bot.ListenForWebhook(webhookPath)
-
-	// Start HTTP server to listen for webhooks
 	err = http.ListenAndServe("0.0.0.0:8081", http.DefaultServeMux)
 	if err != nil {
-		log.Println("Error starting HTTP server:", err)
-		return
+		log.Fatalln("Error starting HTTP server:", err)
 	}
 
-	// Loop to handle incoming messages
 	for update := range updates {
 		if update.Message != nil {
 			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
@@ -47,8 +42,9 @@ func main() {
 
 			_, err := bot.Send(msg)
 			if err != nil {
-				log.Println("Error sending message:", err)
+				log.Println("Error sending message: ", err)
 			}
 		}
 	}
+
 }
